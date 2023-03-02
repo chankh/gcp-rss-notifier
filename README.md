@@ -15,4 +15,4 @@ webhook URL for notification.
 - **Channel Topic** - Pub/Sub topic that dispatches a message for each RSS feed
 - **Item Topic** - Pub/Sub topic that dispatches a message for each new item in an RSS feed
 - **Channels Table** - Firestore table that holds configuration of all RSS feeds
-- **Items table** - Firestore table that record all RSS items that have been processed
+- **Items Table** - Firestore table that record all RSS items that have been processed
