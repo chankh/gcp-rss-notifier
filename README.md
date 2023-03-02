@@ -5,7 +5,7 @@ webhook URL for notification.
 
 ## Architecture
 
-![arch.png][doc/arch.png]
+<img src="doc/arch.png">
 
 ### Resources
 
