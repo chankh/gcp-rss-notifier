@@ -201,7 +201,7 @@ resource "google_cloudfunctions2_function" "process-channel" {
   }
 
   service_config {
-    max_instance_count = 3
+    max_instance_count = 10
     min_instance_count = 0
     available_memory   = "128Mi"
     timeout_seconds    = 60
@@ -252,7 +252,7 @@ resource "google_cloudfunctions2_function" "process-item" {
   }
 
   service_config {
-    max_instance_count = 3
+    max_instance_count = 10
     min_instance_count = 0
     available_memory   = "128Mi"
     timeout_seconds    = 60
