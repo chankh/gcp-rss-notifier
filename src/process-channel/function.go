@@ -93,7 +93,6 @@ func publishItem(ctx context.Context, notifyURL string, items []*gofeed.Item) er
 	t := client.Topic(itemTopic)
 
 	for _, item := range items {
-		fmt.Println(item)
 		feed := FeedItem{
 			NotifyURL: notifyURL,
 			ID:        item.GUID,
