@@ -47,6 +47,7 @@ type ChannelConfig struct {
 
 type FeedItem struct {
 	NotifyURL string `json:"notify"`
+	Feed      string `json:"feed"`
 	ID        string `json:"id"`
 	Updated   string `json:"updated"`
 	Link      string `json:"link"`
@@ -72,16 +73,17 @@ func processChannel(ctx context.Context, e event.Event) error {
 		return fmt.Errorf("failed parsing feed: %v", err)
 	}
 
+	title := feed.Title
 	items, err := removeOldItems(ctx, feed.Items)
 	if err != nil {
 		return fmt.Errorf("failed processing items: %v", err)
 	}
-	publishItem(ctx, channelConfig.NotifyURL, items)
+	publishItem(ctx, channelConfig.NotifyURL, title, items)
 
 	return nil
 }
 
-func publishItem(ctx context.Context, notifyURL string, items []*gofeed.Item) error {
+func publishItem(ctx context.Context, notifyURL string, title string, items []*gofeed.Item) error {
 	client, err := pubsub.NewClient(ctx, projectID)
 	if err != nil {
 		return fmt.Errorf("pubsub.NewClient: %v", err)
@@ -95,6 +97,7 @@ func publishItem(ctx context.Context, notifyURL string, items []*gofeed.Item) er
 	for _, item := range items {
 		feed := FeedItem{
 			NotifyURL: notifyURL,
+			Feed:      title,
 			ID:        item.GUID,
 			Title:     item.Title,
 			Content:   item.Content,

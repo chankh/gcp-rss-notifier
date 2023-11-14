@@ -34,6 +34,7 @@ type PubSubMessage struct {
 
 type FeedItem struct {
 	NotifyURL string `json:"notify"`
+	Feed      string `json:"feed"`
 	ID        string `json:"id"`
 	Updated   string `json:"updated"`
 	Link      string `json:"link"`
@@ -78,7 +79,7 @@ func notify(item FeedItem) error {
 	}
 
 	// Add title and link before contents
-	text = fmt.Sprintf("%s %s\n\n%s", item.Title, item.Link, text)
+	text = fmt.Sprintf("%s <%s|%s>\n\n%s", item.Feed, item.Link, item.Title, text)
 
 	// Trim text if more than 4000 chars
 	if len(text) > 4000 {
@@ -106,7 +107,10 @@ func notify(item FeedItem) error {
 }
 
 func htmlToMarkdown(html string) (string, error) {
-	converter := md.NewConverter("", true, nil)
+	opt := &md.Options{
+		StrongDelimiter: "*",
+	}
+	converter := md.NewConverter("", true, opt)
 
 	return converter.ConvertString(html)
 }
