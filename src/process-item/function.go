@@ -8,10 +8,12 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 
 	"cloud.google.com/go/firestore"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	md "github.com/JohannesKaufmann/html-to-markdown"
+	"github.com/PuerkitoBio/goquery"
 	"github.com/cloudevents/sdk-go/v2/event"
 )
 
@@ -111,6 +113,49 @@ func htmlToMarkdown(html string) (string, error) {
 		StrongDelimiter: "*",
 	}
 	converter := md.NewConverter("", true, opt)
+
+	// Replace <a> rule conversion for Google Chat support
+	converter.AddRules(
+		md.Rule{
+			Filter: []string{"a"},
+			AdvancedReplacement: func(content string, selec *goquery.Selection, opt *md.Options) (md.AdvancedResult, bool) {
+				// if there is no href, no link is used. So just return the content inside the link
+				href, ok := selec.Attr("href")
+				if !ok || strings.TrimSpace(href) == "" || strings.TrimSpace(href) == "#" {
+					return md.AdvancedResult{
+						Markdown: content,
+					}, false
+				}
+
+				// having multiline content inside a link is a bit tricky
+				content = md.EscapeMultiLine(content)
+
+				var title string
+				if t, ok := selec.Attr("title"); ok {
+					t = strings.Replace(t, "\n", " ", -1)
+					// escape all quotes
+					t = strings.Replace(t, `"`, `\"`, -1)
+					title = fmt.Sprintf(` "%s"`, t)
+				}
+
+				// if there is no link content (for example because it contains an svg)
+				// the 'title' or 'aria-label' attribute is used instead.
+				if strings.TrimSpace(content) == "" {
+					content = selec.AttrOr("title", selec.AttrOr("aria-label", ""))
+				}
+
+				// a link without text won't de displayed anyway
+				if content == "" {
+					return md.AdvancedResult{}, true
+				}
+
+				markdown := fmt.Sprintf("<%s%s|%s>", href, title, content)
+				markdown = md.AddSpaceIfNessesary(selec, markdown)
+
+				return md.AdvancedResult{Markdown: markdown}, false
+			},
+		},
+	)
 
 	return converter.ConvertString(html)
 }
