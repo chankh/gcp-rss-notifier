@@ -147,7 +147,7 @@ resource "google_cloudfunctions2_function" "list-channels" {
 
 
   build_config {
-    runtime     = "go120"
+    runtime     = "go125"
     entry_point = "ListChannels"
     source {
       storage_source {
@@ -190,7 +190,7 @@ resource "google_cloudfunctions2_function" "process-channel" {
 
 
   build_config {
-    runtime     = "go120"
+    runtime     = "go125"
     entry_point = "ProcessChannel"
     source {
       storage_source {
@@ -241,7 +241,7 @@ resource "google_cloudfunctions2_function" "process-item" {
 
 
   build_config {
-    runtime     = "go120"
+    runtime     = "go125"
     entry_point = "ProcessItem"
     source {
       storage_source {
